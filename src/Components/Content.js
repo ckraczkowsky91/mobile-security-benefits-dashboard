@@ -11,10 +11,6 @@ import {
   Tabs,
   Typography
 } from '@material-ui/core';
-// import {
-//   ExpandLess,
-//   ExpandMore
-// } from '@material-ui/icons';
 
 import { familyData, countFamily, countDevices } from '../data';
 import AlertDetail from './AlertDetail';
