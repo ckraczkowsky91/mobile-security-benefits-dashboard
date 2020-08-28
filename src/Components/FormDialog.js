@@ -12,11 +12,13 @@ import {
 import { gql, useMutation } from '@apollo/client';
 
 const ADD_FAMILY_MEMBER = gql`
-  mutation AddFamilyMember($first_name: String!, $last_name: String!){
-    addFamilyMember(first_name: $first_name, last_name: $last_name){
-      id
+  mutation AddFamilyMember($first_name: String!, $last_name: String!, $device_type: String){
+    addFamilyMember(first_name: $first_name, last_name: $last_name, devices: {device_type: $device_type}){
       first_name
       last_name
+      devices{
+        device_type
+      }
     }
   }
 `;
@@ -24,26 +26,23 @@ const ADD_FAMILY_MEMBER = gql`
 export default function FormDialog(props){
   let firstNameInput;
   let lastNameInput;
+  let deviceInput;
   const [addFamilyMember, { data }] = useMutation(ADD_FAMILY_MEMBER);
 
   const handleClose = () => {
     props.toggleFormDialog();
   };
 
-  const submitForm = (event) => {
-    event.preventDefault();
-    console.log('event', event);
-  };
-
   return(
     <Dialog open={props.formDialogState} onClose={handleClose}>
     <DialogTitle>Add Family Member</DialogTitle>
     <form
-        onSubmit={e => {
-          e.preventDefault();
-          addFamilyMember({ variables: { first_name: firstNameInput.value, last_name: lastNameInput.value } });
+        onSubmit={(event) => {
+          event.preventDefault();
+          addFamilyMember({ variables: { first_name: firstNameInput.value, last_name: lastNameInput.value, device_type: deviceInput.value } });
           firstNameInput.value = '';
           lastNameInput.value = '';
+          deviceInput.value = '';
         }}
       >
     <DialogContent>
@@ -63,6 +62,13 @@ export default function FormDialog(props){
             lastNameInput = node;
           }}
           placeholder="Last Name"
+        />
+        <Input
+          fullWidth
+          inputRef={node => {
+            deviceInput = node;
+          }}
+          placeholder="Phone Model"
         />
         </DialogContent>
         <DialogActions>

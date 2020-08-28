@@ -1,10 +1,18 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-const familyMemberSchema = new Schema({
-  id: String,
-  first_name: String,
-  last_name: String
+const deviceSchema = new Schema({
+  device_type: String
 });
 
-module.exports = mongoose.model('FamilyMember', familyMemberSchema);
+const familyMemberSchema = new Schema({
+  gqlid: mongoose.Schema.Types.ObjectId,
+  first_name: String,
+  last_name: String,
+  devices: Array
+});
+
+const Device = mongoose.model('Device', deviceSchema);
+const FamilyMember = mongoose.model('FamilyMember', familyMemberSchema);
+
+module.exports = { Device, FamilyMember };

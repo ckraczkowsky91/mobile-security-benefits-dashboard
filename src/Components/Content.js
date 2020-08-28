@@ -11,6 +11,7 @@ import {
   Tabs,
   Typography
 } from '@material-ui/core';
+import { gql } from '@apollo/client';
 
 import { familyData, countFamily, countDevices } from '../data';
 import AlertDetail from './AlertDetail';
@@ -26,12 +27,39 @@ function TabPanel(props){
   );
 };
 
-export default function Content(){
+export default function Content(props){
   const [value, setValue] = React.useState(0);
+  const [familyMembers, setFamilyMembers] = React.useState([]);
+  React.useEffect(() => {
+    console.log('inside effect');
+    props.apolloClient.query({
+      query: gql`
+        query {
+          getAllFamilyMembers{
+            _id
+            first_name
+            last_name
+            devices{
+              device_type
+            }
+          }
+        }
+      `
+    })
+    .then((result) => {
+      console.log('result', result)
+      setFamilyMembers(result.data.getAllFamilyMembers);
+    });
+  });
+
   var index = 0;
 
   const handleChange = (e, newValue) => {
     setValue(newValue);
+  };
+
+  const onDelete = () => {
+    setValue(0);
   };
 
   return(
@@ -46,23 +74,34 @@ export default function Content(){
         <AppBar position="static">
           <Tabs value={value} onChange={handleChange}>
             <Tab label="Alerts"/>
-            {familyData.map((familyMember) =>
-              <Tab label={familyMember.first_name} key={familyMember.id}/>
+            {familyMembers.map((familyMember) =>
+              <Tab label={familyMember.first_name} key={familyMember._id}/>
             )}
           </Tabs>
         </AppBar>
         <TabPanel value={value} index={0}>
           <AlertDetail/>
         </TabPanel>
-        {familyData.map((familyMember) => {
-          index++;
-          return (
-            <TabPanel value={value} index={index}>
-              <FamilyMemberDetail familyMember={familyMember} />
-            </TabPanel>
-          );
-        })}
+        {
+          familyMembers.map((familyMember) => {
+              index++;
+              return (
+                <TabPanel value={value} index={index} key={familyMember._id}>
+                  <FamilyMemberDetail familyMember={familyMember} onDelete={onDelete}/>
+                </TabPanel>
+              );
+          })
+        }
       </Paper>
     </Container>
   );
 };
+
+// {allFamilyMembers.map((familyMember) => {
+//   index++;
+//   return (
+//     <TabPanel value={value} index={index}>
+//       <FamilyMemberDetail familyMember={familyMember} />
+//     </TabPanel>
+//   );
+// })}

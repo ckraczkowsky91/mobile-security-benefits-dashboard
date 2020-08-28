@@ -20,16 +20,6 @@ const apolloClient = new ApolloClient({
   cache: new InMemoryCache()
 });
 
-apolloClient.query({
-  query: gql`
-    query {
-    familyMember(id: "5f3d8f6fa963fa83534741b6"){
-      first_name
-      }
-    }
-  `
-}).then(result => console.log(result.data.familyMember.first_name));
-
 export default function App(){
   const [anchorElement, setAnchorElement] = React.useState(null);
   const [formDialogState, setFormDialogState] = React.useState(false);
@@ -66,7 +56,7 @@ export default function App(){
         </Menu>
         <FormDialog formDialogState={formDialogState} toggleFormDialog={toggleFormDialog} />
         <div style={{display: 'inline-block', width: '100%'}}>
-          <Content/>
+          <Content apolloClient={apolloClient}/>
         </div>
       </div>
     </ApolloProvider>
